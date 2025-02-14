@@ -1,15 +1,13 @@
 import { Router } from "express";
-import { HttpError } from "../errors/HttpError";
+import { LeadsController } from "../controllers/LeadsController";
 
 const router = Router()
 
-router.get('/test', async (req, res, next) => {
-    try {
-        throw new HttpError(401, "Não autorizado!")
-        res.json({ message: "ok!" })
-    } catch (error) {
-        next(error)
-    }
-})
+const leadsController = new LeadsController();
+
+router.get('/leads', leadsController.index)
+router.post('/leads', leadsController.create)
+router.get('/leads/:id', leadsController.show)
+router.put('/leads/:id', leadsController.update)
 
 export { router }
