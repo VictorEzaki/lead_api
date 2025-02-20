@@ -51,7 +51,14 @@ export class LeadsController {
             const { name, email, phone, status } = req.body
             const body = CreateLeadRequestSchema.parse({ name, email, phone, status })
 
-            const updatedLead = await prisma.lead.update({
+            const updatedLead = await prisma.lead.findUnique({ where: {
+                id: +id
+            }})
+            if (!updatedLead) {
+                throw new HttpError(404, 'Lead not found!')
+            }
+
+            await prisma.lead.update({
                 data: body,
                 where: {
                     id: +id
@@ -59,6 +66,23 @@ export class LeadsController {
             })
 
             res.status(200).json(updatedLead)
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    delete: Handler = async (req, res, next) => {
+        try {
+            const { id } = req.params
+            const deletedLead = await prisma.lead.findUnique({ where: { id: +id } })
+
+            if (!deletedLead) {
+                throw new HttpError(404, 'Lead not found!')
+            }
+
+            await prisma.lead.delete({ where: { id: +id } })
+
+            res.status(200).json({ message: 'Deleted successfuly' })
         } catch (error) {
             next(error)
         }
